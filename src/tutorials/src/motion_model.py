@@ -13,15 +13,15 @@ class MotionModel:
         ])
         self.Bt = np.array([
             [0, 0],
-            [1, 0],
+            [1/self.mass, 0],
             [0, 0],
-            [0, 1.],
+            [0, 1/self.mass],
         ])
         self.C = np.array([
             [1, 0, 0, 0],
             [0, 0, 1, 0.],
         ])
-        self.Qt = np.random.randn(4, 4) * 0.005
+        self.Qt = np.random.randn(4, 4) * 0.001
         self.Qt = self.Qt @ self.Qt.T
         self.A = None
         self.B = None
@@ -40,6 +40,6 @@ class MotionModel:
     def step(self, x, u, dt, noise=False):
         self.discretization(dt)
         w_process_noise = np.random.multivariate_normal(np.zeros(4), self.Q, 1).T
-        x = self.A @ x + self.B @ (u / self.mass) + (w_process_noise if noise else 0)
+        x = self.A @ x + self.B @ u + (w_process_noise if noise else 0)
         y = self.C @ x
         return x, y
